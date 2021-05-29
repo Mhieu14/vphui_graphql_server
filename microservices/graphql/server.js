@@ -3,7 +3,7 @@ import { } from 'dotenv/config';
 import express from 'express';
 import { createServer } from 'http';
 import mongoose from 'mongoose';
-import models from './models';
+import models from '../../models';
 import resolvers from './resolvers';
 import schema from './schema';
 import { createApolloServer } from './utils/apollo-server';
@@ -20,6 +20,11 @@ mongoose
   .then(() => console.log('DB connected'))
   .catch((err) => console.error(err));
 
+const isLog = process.env.NODE_ENV !== 'production';
+if (isLog) {
+  mongoose.set('debug', true);
+}
+
 // Initializes application
 const app = express();
 
@@ -28,7 +33,12 @@ const corsOptions = {
   origin: process.env.FRONTEND_URL,
   credentials: true,
 };
+
+// enabling CORS for all requests
 app.use(cors( /* corsOptions */ ));
+
+// adding morgan to log HTTP requests
+// app.use(morgan('dev'));
 
 // Create a Apollo Server
 const server = createApolloServer(schema, resolvers, models);

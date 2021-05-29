@@ -1,4 +1,4 @@
-import { uploadToCloudinary, deleteFromCloudinary } from '../utils/cloudinary';
+import { deleteFromCloudinary, uploadToCloudinary } from '../utils/cloudinary';
 
 const Query = {
   /**
@@ -76,7 +76,7 @@ const Query = {
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: 'desc' });
-
+    console.log(followedPosts[0].likes);
     return { posts: followedPosts, count: followedPostsCount };
   },
   /**

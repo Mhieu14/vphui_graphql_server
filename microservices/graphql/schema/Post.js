@@ -64,7 +64,7 @@ const PostSchema = gql`
   # ---------------------------------------------------------
   extend type Query {
     # Gets user posts by username
-    getUserPosts(username: String!, skip: Int, limit: Int): UserPostsPayload
+    getUserPosts(username: String!, skip: Int, limit: Int): PostsPayload
 
     # Gets posts from followed users
     getFollowedPosts(userId: String!, skip: Int, limit: Int): PostsPayload
