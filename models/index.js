@@ -1,6 +1,9 @@
+import AttentionMatchup from './AttentionMatchup';
 import Comment from './Comment';
 import Follow from './Follow';
 import Like from './Like';
+import Match from './Match';
+import Matchup from './Matchup';
 import Member from './Member';
 import Message from './Message';
 import Notification from './Notification';
@@ -20,4 +23,7 @@ export default {
   Team,
   Member,
   Stadium,
+  AttentionMatchup,
+  Matchup,
+  Match,
 };

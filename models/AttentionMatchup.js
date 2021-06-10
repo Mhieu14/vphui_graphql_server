@@ -5,9 +5,8 @@ const Schema = mongoose.Schema;
 /**
  * User schema that has references to Post, Like, Comment, Follow and Notification schemas
  */
-const matchupSchema = new Schema(
+const attentionMatchupSchema = new Schema(
   {
-    description: String,
     teamCreate: {
       type: Schema.Types.ObjectId,
       ref: 'Team'
@@ -16,26 +15,14 @@ const matchupSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'User'
     },
-    stadium: {
+    matchup: {
       type: Schema.Types.ObjectId,
-      ref: 'Stadium'
-    },
-    timeStart: {
-      type: Date,
-    },
-    status: {
-      type: String,
-      lowercase: true,
-      trim: true,
-    },
-    attentions: [{
-      type: Schema.Types.ObjectId,
-      ref: 'AttentionMatchup'
-    }]
+      ref: 'Matchup'
+    }
   },
   {
     timestamps: true,
   }
 );
 
-export default mongoose.model('Matchups', matchupSchema);
+export default mongoose.model('AttentionMatchups', attentionMatchupSchema);

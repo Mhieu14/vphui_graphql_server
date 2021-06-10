@@ -4,13 +4,14 @@ import express from 'express';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import { connectMongo } from './dbconnect';
+import MatchupRoute from './routes/matchup.route';
 import StadiumRoute from './routes/stadium.route';
-// require Route
 import TeamRoute from './routes/team.route';
+connectMongo()
+
 // defining the Express app
 const app = express();
 
-connectMongo()
 
 const isLog = process.env.NODE_ENV !== 'production';
 if (isLog) {
@@ -38,6 +39,7 @@ app.get('/health-check', (req, res) => {
 // require api
 app.use('/api', TeamRoute);
 app.use('/api', StadiumRoute);
+app.use('/api', MatchupRoute);
 // starting the server
 app.listen(PORT, () => {
   console.log(`  Service restAPI start on port: ${PORT}`);

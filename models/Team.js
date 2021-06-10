@@ -44,6 +44,12 @@ const teamSchema = new Schema(
         type: Schema.Types.ObjectId,
         ref: 'Member',
       }
+    ],
+    matchs: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Match',
+      }
     ]
   },
   {

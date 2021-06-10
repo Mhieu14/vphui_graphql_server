@@ -5,16 +5,23 @@ const Schema = mongoose.Schema;
 /**
  * User schema that has references to Post, Like, Comment, Follow and Notification schemas
  */
-const matchupSchema = new Schema(
+const matchSchema = new Schema(
   {
-    description: String,
-    teamCreate: {
+    teamA: {
       type: Schema.Types.ObjectId,
       ref: 'Team'
     },
-    userCreate: {
+    teamB: {
       type: Schema.Types.ObjectId,
-      ref: 'User'
+      ref: 'Team'
+    },
+    teamAGoalUpdateByA: Number,
+    teamBGoalUpdateByB: Number,
+    teamAGoalUpdateByB: Number,
+    teamBGoalUpdateByB: Number,
+    matchup: {
+      type: Schema.Types.ObjectId,
+      ref: 'Matchup'
     },
     stadium: {
       type: Schema.Types.ObjectId,
@@ -28,14 +35,10 @@ const matchupSchema = new Schema(
       lowercase: true,
       trim: true,
     },
-    attentions: [{
-      type: Schema.Types.ObjectId,
-      ref: 'AttentionMatchup'
-    }]
   },
   {
     timestamps: true,
   }
 );
 
-export default mongoose.model('Matchups', matchupSchema);
+export default mongoose.model('Match', matchSchema);

@@ -1,12 +1,19 @@
 import express from 'express';
-import MatchupController from '../controllers/stadium.controller';
+import MatchController from '../controllers/match.controller';
+import MatchupController from '../controllers/matchup.controller';
 import { authorizationToken } from '../middlewares/auth.middlewares';
 
 const router = express.Router();
 
 router.post('/matchup/create', authorizationToken, MatchupController.apiCreateMatchup);
-// router.get('/matchup/getAll', authorizationToken, MatchupController.apiGetListMatchup);
+router.get('/matchup/getListMatchupTeam', authorizationToken, MatchupController.apiGetListMatchupTeam);
+router.get('/matchup/getAll', authorizationToken, MatchupController.apiGetAllMatchup);
 router.get('/matchup/getDetail', authorizationToken, MatchupController.apiGetDetailMatchUp);
-// router.post('/matchup/createCare', authorizationToken, MatchupController.apiCreateCare);
-// router.post('/matchup/confirm', authorizationToken, MatchupController.apiConfirmMatchup);
+
+router.post('/matchup/createAttention', authorizationToken, MatchupController.apiCreateAttention);
+router.post('/matchup/removeAttention', authorizationToken, MatchupController.apiRemoveAttention);
+router.post('/matchup/confirmAttention', authorizationToken, MatchupController.apiConfirmMatchup);
+
+router.get('/match/detail', authorizationToken, MatchController.apiGetDetailMatch);
+router.get('/match/listMatchTeam', authorizationToken, MatchController.apiGetListMatchTeam);
 export default router
