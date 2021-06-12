@@ -76,7 +76,6 @@ const Query = {
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: 'desc' });
-    console.log(followedPosts[0].likes);
     return { posts: followedPosts, count: followedPostsCount };
   },
   /**
