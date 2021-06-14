@@ -6,4 +6,4 @@
 
 require = require('esm')(module);
 
-module.exports = require('./src/server.js');
+module.exports = require('./server.js');

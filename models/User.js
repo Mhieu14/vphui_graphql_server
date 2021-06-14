@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
@@ -70,6 +70,12 @@ const userSchema = new Schema(
         ref: 'Follow',
       },
     ],
+    followingTeams: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'FollowTeam',
+      },
+    ],
     notifications: [
       {
         type: Schema.Types.ObjectId,
@@ -82,6 +88,12 @@ const userSchema = new Schema(
         ref: 'User',
       },
     ],
+    memberTeams: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Member',
+      }
+    ]
   },
   {
     timestamps: true,
