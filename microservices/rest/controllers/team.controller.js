@@ -41,6 +41,9 @@ export default {
         return ResponseDtos.createErrorResponse(res, StatusCode.MISSING_PARAM, MessageRes.MISSING_PARAM);
       }
       const user = await TeamService.getTeamsUser(userId);
+      if(!user) {
+        return ResponseDtos.createErrorResponse(res, StatusCode.BAD_REQUEST, 'User not found');
+      }
       const output = _.map(user.memberTeams, item => {
         return {
           id: _.get(item, 'team.id'),
@@ -74,6 +77,7 @@ export default {
       const teamMember = _.map(_.get(teamDetail, 'members'), (item) => {
         return {
           member_id: _.get(item, '_id'),
+          user_id: _.get(item, 'user.id'),
           username: _.get(item, 'user.username'),
           fullname: _.get(item, 'user.fullName'),
           image: _.get(item, 'user.image'),

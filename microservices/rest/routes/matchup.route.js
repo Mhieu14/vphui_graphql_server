@@ -16,4 +16,7 @@ router.post('/matchup/confirmAttention', authorizationToken, MatchupController.a
 
 router.get('/match/detail', authorizationToken, MatchController.apiGetDetailMatch);
 router.get('/match/listMatchTeam', authorizationToken, MatchController.apiGetListMatchTeam);
+router.get('/match/listMatchUser', authorizationToken, MatchController.apiGetListMatchUser);
+router.post('/match/updateMatchResult', authorizationToken, MatchController.apiUpdateMatchResult);
+
 export default router

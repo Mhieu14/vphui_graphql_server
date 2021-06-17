@@ -200,7 +200,7 @@ export default {
         user: authUser.id,
         team: _.get(attention, 'matchup.teamCreate'),
       })
-      if (authAdmin.role != 'admin') {
+      if (!authAdmin || _.get(authAdmin, 'role') != 'admin') {
         return ResponseDtos.createErrorResponse(res, StatusCode.BAD_REQUEST, MessageRes.PERMISSIONS_DENIED);
       }
       const dataMatch = {

@@ -16,7 +16,7 @@ const matchSchema = new Schema(
       ref: 'Team'
     },
     teamAGoalUpdateByA: Number,
-    teamBGoalUpdateByB: Number,
+    teamBGoalUpdateByA: Number,
     teamAGoalUpdateByB: Number,
     teamBGoalUpdateByB: Number,
     matchup: {
