@@ -101,7 +101,7 @@ const Query = {
       user.seen = lastMessage.seen;
       user.lastMessageCreatedAt = lastMessage.createdAt;
       user.lastMessage = lastMessage.message;
-      user.lastMessageSender = (lastMessage == received);
+      user.lastMessageSender = (lastMessage == sended);
       if (user.lastMessageCreatedAt) {
         conversations.push(user);
       }
@@ -110,7 +110,7 @@ const Query = {
     const sortedConversations = conversations.sort((a, b) =>
       b.lastMessageCreatedAt.toString().localeCompare(a.lastMessageCreatedAt)
     );
-
+    console.log(conversations);
     return sortedConversations;
   },
 };
