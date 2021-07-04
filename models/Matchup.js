@@ -38,4 +38,4 @@ const matchupSchema = new Schema(
   }
 );
 
-export default mongoose.model('Matchups', matchupSchema);
+export default mongoose.model('Matchup', matchupSchema);

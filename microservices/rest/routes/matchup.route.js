@@ -6,6 +6,7 @@ import { authorizationToken } from '../middlewares/auth.middlewares';
 const router = express.Router();
 
 router.post('/matchup/create', authorizationToken, MatchupController.apiCreateMatchup);
+router.post('/matchup/delete', authorizationToken, MatchupController.apiDeleteMatchup);
 router.get('/matchup/getListMatchupTeam', authorizationToken, MatchupController.apiGetListMatchupTeam);
 router.get('/matchup/getAll', authorizationToken, MatchupController.apiGetAllMatchup);
 router.get('/matchup/getDetail', authorizationToken, MatchupController.apiGetDetailMatchUp);

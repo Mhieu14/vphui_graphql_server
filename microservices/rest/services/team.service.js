@@ -40,9 +40,9 @@ export default {
     }
   },
 
-  getTeamsUser: async (userId) => {
+  getTeamsUser: async (username) => {
     try {
-      return Models.User.findOne({_id: userId })
+      return Models.User.findOne({ username })
       .populate({
         path: 'memberTeams',
         populate: [

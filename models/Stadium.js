@@ -34,4 +34,4 @@ const stadiumSchema = new Schema(
   }
 );
 
-export default mongoose.model('Stadiums', stadiumSchema);
+export default mongoose.model('Stadium', stadiumSchema);

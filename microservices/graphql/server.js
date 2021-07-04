@@ -3,23 +3,14 @@ import { } from 'dotenv/config';
 import express from 'express';
 import { createServer } from 'http';
 import mongoose from 'mongoose';
+import { connectMongo } from '../../dbconnect';
 import models from '../../models';
 import resolvers from './resolvers';
 import schema from './schema';
 import { createApolloServer } from './utils/apollo-server';
 
-
 // Connect to database
-mongoose
-  .connect(process.env.MONGO_URL, {
-    useCreateIndex: true,
-    useNewUrlParser: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log('DB connected'))
-  .catch((err) => console.error(err));
-
+connectMongo();
 const isLog = process.env.NODE_ENV !== 'production';
 if (isLog) {
   mongoose.set('debug', true);

@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Schedule from 'node-schedule';
 import Models from '../../../models/index';
 import MessageRes from '../constants/messageres.constant';
 import StatusCode from '../constants/statuscode.constant';
@@ -21,6 +22,11 @@ export default {
       if (!team) {
         return ResponseDtos.createErrorResponse(res, StatusCode.BAD_REQUEST, 'Team not found');
       }
+      const timeStartDate = new Date(timeStart);
+      // console.log(timeStartDate);
+      if (timeStartDate.getTime() <= (new Date()).getTime()) {
+        return ResponseDtos.createErrorResponse(res, StatusCode.BAD_REQUEST, 'Time start invalid');
+      }
       const authAdmin = await Models.Member.findOne({
         user: authUser.id,
         team: team.id,
@@ -33,10 +39,43 @@ export default {
         teamCreate: team.id,
         description,
         stadium,
-        timeStart: new Date(timeStart),
+        timeStart: timeStartDate,
         status: 'active'
       }).save();
+
+      Schedule.scheduleJob(timeStartDate, async function(){
+        await Models.Matchup.findOneAndUpdate({ _id: newMatchup.id, status: 'active' }, { status: 'overdue' });
+      });
+
       return ResponseDtos.createSuccessResponse(res, newMatchup);
+    } catch (error) {
+      console.log(error);
+      return ResponseDtos.createErrorResponse(res, StatusCode.SERVER_ERROR, MessageRes.SERVER_ERROR);
+    }
+  },
+
+  apiDeleteMatchup: async (req, res) => {
+    const data = req.body;
+    const authUser = req.authUser;
+    const matchupId = data.matchup_id;
+    try {
+      if (!matchupId) {
+        return ResponseDtos.createErrorResponse(res, StatusCode.MISSING_PARAM, MessageRes.MISSING_PARAM);
+      }
+      const matchup = await Models.Matchup.findOne({ _id: matchupId });
+      if (_.get(matchup, 'status') == 'matched') {
+        return ResponseDtos.createErrorResponse(res, StatusCode.FORBIDDEN, 'Matchup already matched');
+      }
+      const authAdmin = await Models.Member.findOne({
+        user: authUser.id,
+        team: matchup.teamCreate,
+      });
+      if (_.get(authAdmin, 'role') != 'admin') {
+        return ResponseDtos.createErrorResponse(res, StatusCode.FORBIDDEN, MessageRes.PERMISSIONS_DENIED);
+      }
+      const deletedMatchup = await Models.Matchup.findOneAndUpdate({ _id: matchupId }, { status: 'deleted' }, { returnOriginal: false });
+
+      return ResponseDtos.createSuccessResponse(res, deletedMatchup);
     } catch (error) {
       console.log(error);
       return ResponseDtos.createErrorResponse(res, StatusCode.SERVER_ERROR, MessageRes.SERVER_ERROR);
@@ -143,7 +182,7 @@ export default {
       })
       if (attention) {
         return ResponseDtos.createErrorResponse(res, StatusCode.BAD_REQUEST, 'Attention matchup already existed');
-      }
+      }PERMISSIONS_DENIED
       
       const dataAttentionInsert = {
         teamCreate: team.id,
@@ -211,6 +250,9 @@ export default {
         timeStart: timeStart || _.get(attention, 'matchup.timeStart'),
       }
       const newMatch = await MatchupService.confirmMatchup(dataMatch)
+      Schedule.scheduleJob(new Date(newMatch.timeStart), function(){
+        Models.Match.findOneAndUpdate({ _id: newMatch.id, status: 'active' }, { status: 'happened' });
+      });
       return ResponseDtos.createSuccessResponse(res, newMatch);
     } catch (error) {
       console.log(error);

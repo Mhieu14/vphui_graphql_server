@@ -97,7 +97,7 @@ export default {
           role: 'admin',
           user: authUser.id,
         }) 
-        console.log(listAdmin);
+        // console.log(listAdmin);
         let updateObject = null
         if ( listAdmin.length == 0 ) {
           return ResponseDtos.createErrorResponse(res, StatusCode.FORBIDDEN, MessageRes.PERMISSIONS_DENIED);

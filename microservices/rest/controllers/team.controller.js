@@ -35,12 +35,12 @@ export default {
 
   apiGetTeamsUser: async (req, res) => {
     const query = req.query;
-    const userId = query.user_id;
+    const username = query.username;
     try {
-      if (!userId) {
+      if (!username) {
         return ResponseDtos.createErrorResponse(res, StatusCode.MISSING_PARAM, MessageRes.MISSING_PARAM);
       }
-      const user = await TeamService.getTeamsUser(userId);
+      const user = await TeamService.getTeamsUser(username);
       if(!user) {
         return ResponseDtos.createErrorResponse(res, StatusCode.BAD_REQUEST, 'User not found');
       }
@@ -49,7 +49,7 @@ export default {
           id: _.get(item, 'team.id'),
           fullname: _.get(item, 'team.fullname'),
           teamname: _.get(item, 'team.teamname'),
-          is_owner: !!(_.get(item, 'team.owner') == userId),
+          is_owner: !!(_.get(item, 'team.owner') == username),
           role: _.get(item, 'role'),
           create_at: _.get(item, 'team.createdAt'),
           join_at: _.get(item, 'createdAt'),

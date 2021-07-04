@@ -25,4 +25,4 @@ const attentionMatchupSchema = new Schema(
   }
 );
 
-export default mongoose.model('AttentionMatchups', attentionMatchupSchema);
+export default mongoose.model('AttentionMatchup', attentionMatchupSchema);

@@ -3,20 +3,22 @@ import { } from 'dotenv/config';
 import express from 'express';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
-import { connectMongo } from './dbconnect';
+import { connectMongo } from '../../dbconnect';
+import Models from '../../models';
 import MatchupRoute from './routes/matchup.route';
 import StadiumRoute from './routes/stadium.route';
 import TeamRoute from './routes/team.route';
-connectMongo()
 
-// defining the Express app
-const app = express();
-
-
+Models
+// connect to database
+connectMongo();
 const isLog = process.env.NODE_ENV !== 'production';
 if (isLog) {
   mongoose.set('debug', true);
 }
+
+// defining the Express app
+const app = express();
 
 const PORT = process.env.REST_PORT || 6000;
 

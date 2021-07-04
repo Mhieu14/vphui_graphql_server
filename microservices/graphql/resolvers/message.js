@@ -1,8 +1,8 @@
-import mongoose from 'mongoose';
 import { withFilter } from 'apollo-server';
-
-import { pubSub } from '../utils/apollo-server';
+import mongoose from 'mongoose';
 import { MESSAGE_CREATED, NEW_CONVERSATION } from '../constants/Subscriptions';
+import { pubSub } from '../utils/apollo-server';
+
 
 const Query = {
   /**
@@ -33,17 +33,11 @@ const Query = {
     const users = await User.findById(authUserId).populate('messages', 'id username fullName image isOnline');
 
     // Get last messages with wom authUser had a chat
-    const lastMessages = await Message.aggregate([
+    // Get last messages with wom authUser had a chat
+    const lastMessagesReceived = await Message.aggregate([
       {
         $match: {
-          $or: [
-            {
-              receiver: mongoose.Types.ObjectId(authUserId),
-            },
-            {
-              sender: mongoose.Types.ObjectId(authUserId),
-            },
-          ],
+          receiver: mongoose.Types.ObjectId(authUserId),
         },
       },
       {
@@ -52,6 +46,26 @@ const Query = {
       {
         $group: {
           _id: '$sender',
+          doc: {
+            $first: '$$ROOT',
+          },
+        },
+      },
+      { $replaceRoot: { newRoot: '$doc' } },
+    ]);
+
+    const lastMessagesSended = await Message.aggregate([
+      {
+        $match: {
+          sender: mongoose.Types.ObjectId(authUserId),
+        },
+      },
+      {
+        $sort: { createdAt: -1 },
+      },
+      {
+        $group: {
+          _id: '$receiver',
           doc: {
             $first: '$$ROOT',
           },
@@ -71,26 +85,27 @@ const Query = {
         isOnline: u.isOnline,
       };
 
-      const sender = lastMessages.find((m) => u.id === m.sender.toString());
-      if (sender) {
-        user.seen = sender.seen;
-        user.lastMessageCreatedAt = sender.createdAt;
-        user.lastMessage = sender.message;
-        user.lastMessageSender = false;
-      } else {
-        const receiver = lastMessages.find((m) => u.id === m.receiver.toString());
-
-        if (receiver) {
-          user.seen = receiver.seen;
-          user.lastMessageCreatedAt = receiver.createdAt;
-          user.lastMessage = receiver.message;
-          user.lastMessageSender = true;
-        }
+      const received = lastMessagesReceived.find((m) => u.id === m.sender.toString());
+      const sended = lastMessagesSended.find((m) => u.id === m.receiver.toString());
+      let lastMessage;
+      if (received && sended) {
+        lastMessage = (received.createdAt > sended.createdAt) ? received : sended;
       }
-
-      conversations.push(user);
+      else if (!received) {
+        lastMessage = sended;
+      }
+      else if (!sended) {
+        lastMessage = received;
+      }
+      else return;
+      user.seen = lastMessage.seen;
+      user.lastMessageCreatedAt = lastMessage.createdAt;
+      user.lastMessage = lastMessage.message;
+      user.lastMessageSender = (lastMessage == received);
+      if (user.lastMessageCreatedAt) {
+        conversations.push(user);
+      }
     });
-
     // Sort users by last created messages date
     const sortedConversations = conversations.sort((a, b) =>
       b.lastMessageCreatedAt.toString().localeCompare(a.lastMessageCreatedAt)
