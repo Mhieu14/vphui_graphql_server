@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Mongoose from 'mongoose';
 import Schedule from 'node-schedule';
 import Models from '../../../models/index';
 import MessageRes from '../constants/messageres.constant';
@@ -111,8 +112,20 @@ export default {
 
   apiGetAllMatchup: async (req, res) => {
     const query = req.query;
+    const stadiumID = query.stadium_id;
+    const timeFrom = query.time_from;
+    const timeTo = query.time_to;
     try {
-      const listMatchUp = await Models.Matchup.find({ status: 'active' }).populate('teamCreate').populate({
+      let query = {
+        status: 'active',
+        stadium: Mongoose.Types.ObjectId(stadiumID),
+        created_on: {
+          $gte: (timeFrom) ? new Date(timeFrom) : null, 
+          $lte: (timeTo) ? new Date(timeTo) : null
+        }
+      }
+      query = _.omitBy(query, _.isNil)
+      const listMatchUp = await Models.Matchup.find(query).populate('teamCreate').populate({
         path: 'stadium',
         model: Models.Stadium
       });

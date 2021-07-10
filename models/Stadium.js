@@ -31,6 +31,7 @@ const stadiumSchema = new Schema(
   },
   {
     timestamps: true,
+    collection: 'stadiums'
   }
 );
 

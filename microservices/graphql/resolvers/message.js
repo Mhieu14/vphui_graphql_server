@@ -1,8 +1,8 @@
 import { withFilter } from 'apollo-server';
+import _ from 'lodash';
 import mongoose from 'mongoose';
 import { MESSAGE_CREATED, NEW_CONVERSATION } from '../constants/Subscriptions';
 import { pubSub } from '../utils/apollo-server';
-
 
 const Query = {
   /**
@@ -107,10 +107,11 @@ const Query = {
       }
     });
     // Sort users by last created messages date
-    const sortedConversations = conversations.sort((a, b) =>
-      b.lastMessageCreatedAt.toString().localeCompare(a.lastMessageCreatedAt)
-    );
-    console.log(conversations);
+    // const sortedConversations = conversations.sort((a, b) =>
+    //   b.lastMessageCreatedAt.toString().localeCompare(a.lastMessageCreatedAt)
+    // );
+    const sortedConversations = _.orderBy(conversations, 'lastMessageCreatedAt', 'desc');
+    // console.log(conversations);
     return sortedConversations;
   },
 };
