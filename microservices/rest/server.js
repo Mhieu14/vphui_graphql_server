@@ -12,7 +12,7 @@ import TeamRoute from './routes/team.route';
 Models
 // connect to database
 connectMongo();
-const isLog = process.env.NODE_ENV !== 'production';
+const isLog = (process.env.NODE_ENV == 'development');
 if (isLog) {
   mongoose.set('debug', true);
 }

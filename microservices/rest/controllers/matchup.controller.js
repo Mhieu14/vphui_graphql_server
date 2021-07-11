@@ -25,7 +25,7 @@ export default {
       }
       const timeStartDate = new Date(timeStart);
       // console.log(timeStartDate);
-      if (timeStartDate.getTime() <= (new Date()).getTime()) {
+      if (!timeStart || _.isNaN(timeStartDate.getTime()) || timeStartDate.getTime() <= (new Date()).getTime()) {
         return ResponseDtos.createErrorResponse(res, StatusCode.BAD_REQUEST, 'Time start invalid');
       }
       const authAdmin = await Models.Member.findOne({
