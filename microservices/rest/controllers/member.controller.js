@@ -91,7 +91,10 @@ export default {
       if (!member) {
         return ResponseDtos.createErrorResponse(res, StatusCode.BAD_REQUEST, 'Member not existed');
       }
-      if (_.get(authRequester, 'role') != 'admin' && authRequester.id != user.id) {
+      if (!authRequester) {
+        return ResponseDtos.createErrorResponse(res, StatusCode.FORBIDDEN, MessageRes.PERMISSIONS_DENIED);
+      }
+      if (_.get(authRequester, 'role') != 'admin' && authRequester.user != user.id) {
         return ResponseDtos.createErrorResponse(res, StatusCode.FORBIDDEN, MessageRes.PERMISSIONS_DENIED);
       }
       
