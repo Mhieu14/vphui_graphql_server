@@ -207,7 +207,7 @@ export default {
       })
       if (attention) {
         return ResponseDtos.createErrorResponse(res, StatusCode.BAD_REQUEST, 'Attention matchup already existed');
-      }PERMISSIONS_DENIED
+      }
       
       const dataAttentionInsert = {
         teamCreate: team.id,
