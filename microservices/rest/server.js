@@ -4,12 +4,10 @@ import express from 'express';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import { connectMongo } from '../../dbconnect';
-import Models from '../../models';
 import MatchupRoute from './routes/matchup.route';
 import StadiumRoute from './routes/stadium.route';
 import TeamRoute from './routes/team.route';
 
-Models
 // connect to database
 connectMongo();
 const isLog = (process.env.NODE_ENV == 'development');

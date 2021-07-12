@@ -118,17 +118,29 @@ export default {
     try {
       let query = {
         status: 'active',
-        stadium: Mongoose.Types.ObjectId(stadiumID),
-        created_on: {
+        stadium: (stadiumID) ? Mongoose.Types.ObjectId(stadiumID) : null,
+        timeStart: {
           $gte: (timeFrom) ? new Date(timeFrom) : null, 
           $lte: (timeTo) ? new Date(timeTo) : null
         }
+      }
+      query.timeStart = _.omitBy(query.timeStart, _.isNil)
+      if(_.isEqual(query.timeStart, {})) {
+        query.timeStart = null;
       }
       query = _.omitBy(query, _.isNil)
       const listMatchUp = await Models.Matchup.find(query).populate('teamCreate').populate({
         path: 'stadium',
         model: Models.Stadium
       });
+      // await Models.Matchup.updateMany({
+      //   timeStart: {
+      //     $lte: new Date()
+      //   },
+      //   status: 'active',
+      // }, {
+      //   status: 'overdue',
+      // })
       return ResponseDtos.createSuccessResponse(res, listMatchUp);
     } catch (error) {
       console.log(error);
