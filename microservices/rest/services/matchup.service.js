@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import mongoose from 'mongoose';
 import Models from '../../../models/index';
 
@@ -69,4 +70,21 @@ export default {
       throw error;
     }
   },
+
+  getSetTeamAdmin: async (userID) => {
+    try {
+      const authAdmin = await Models.Member.find({
+        user: userID,
+        role: 'admin'
+      }).lean();
+      const setTeamAdmin = new Set()
+      _.forEach(authAdmin, item => {
+        setTeamAdmin.add(_.get(item, 'team').toString())
+      });
+      return setTeamAdmin
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
 }

@@ -7,6 +7,21 @@ import StatusCode from '../constants/statuscode.constant';
 import ResponseDtos from '../dtos/response.dto';
 import MatchupService from '../services/matchup.service';
 
+const setStatusIsMyTeamAdminMatchup = (setTeam, matchup) => {
+  matchup.attentions = _.map(matchup.attentions, item => {
+    item = setStatusIsMyTeamAdminAttention(setTeam, item)
+    // item.is_my_team_admin_attention = setTeam.has(_.get(item, 'teamCreate._id').toString())
+    return item;
+  })
+  matchup.is_my_team_admin_matchup = setTeam.has(_.get(matchup, 'teamCreate._id').toString())
+  return matchup
+}
+
+const setStatusIsMyTeamAdminAttention = (setTeam, attention) => {
+  attention.is_my_team_admin_attention = setTeam.has(_.get(attention, 'teamCreate._id').toString())
+  return attention
+}
+
 export default {
   apiCreateMatchup: async (req, res) => {
     const data = req.body;
@@ -86,6 +101,7 @@ export default {
   apiGetListMatchupTeam: async (req, res) => {
     const query = req.query;
     const teamname = query.teamname;
+    const authUser = req.authUser;
     try {
       if (!teamname) {
         return ResponseDtos.createErrorResponse(res, StatusCode.MISSING_PARAM, MessageRes.MISSING_PARAM);
@@ -94,15 +110,26 @@ export default {
       if (!team) {
         return ResponseDtos.createErrorResponse(res, StatusCode.BAD_REQUEST, 'Team not found');
       }
+      const setTeamAdmin = await MatchupService.getSetTeamAdmin(authUser.id);
       const listAttented = await Models.AttentionMatchup.find({ teamCreate: team.id })
       const listIdMatchUpAttented = _.map(listAttented, 'matchup')
-      const listMatchUp = await Models.Matchup.find().and([
+      let listMatchUp = await Models.Matchup.find().and([
         { $or: [{ _id: listIdMatchUpAttented }, { teamCreate: team.id }] },
         { status: 'active' },
       ]).populate('teamCreate').populate({
+        path: 'attentions',
+        model: Models.AttentionMatchup,
+        populate: {
+          path: 'teamCreate',
+          model: Models.Team,
+        }
+      }).populate({
         path: 'stadium',
         model: Models.Stadium
-      });
+      }).lean();
+      listMatchUp = _.map(listMatchUp, item => {
+        return setStatusIsMyTeamAdminMatchup(setTeamAdmin, item)
+      })
       return ResponseDtos.createSuccessResponse(res, listMatchUp);
     } catch (error) {
       console.log(error);
@@ -115,7 +142,9 @@ export default {
     const stadiumID = query.stadium_id;
     const timeFrom = query.time_from;
     const timeTo = query.time_to;
+    const authUser = req.authUser;
     try {
+      const setTeamAdmin = await MatchupService.getSetTeamAdmin(authUser.id);
       let query = {
         status: 'active',
         stadium: (stadiumID) ? Mongoose.Types.ObjectId(stadiumID) : null,
@@ -129,10 +158,20 @@ export default {
         query.timeStart = null;
       }
       query = _.omitBy(query, _.isNil)
-      const listMatchUp = await Models.Matchup.find(query).populate('teamCreate').populate({
+      let listMatchUp = await Models.Matchup.find(query).populate('teamCreate').populate({
+        path: 'attentions',
+        model: Models.AttentionMatchup,
+        populate: {
+          path: 'teamCreate',
+          model: Models.Team,
+        }
+      }).populate({
         path: 'stadium',
         model: Models.Stadium
-      });
+      }).lean();
+      listMatchUp = _.map(listMatchUp, item => {
+        return setStatusIsMyTeamAdminMatchup(setTeamAdmin, item)
+      })
       // await Models.Matchup.updateMany({
       //   timeStart: {
       //     $lte: new Date()
@@ -151,18 +190,26 @@ export default {
   apiGetDetailMatchUp: async (req, res) => {
     const query = req.query;
     const id = query.matchup_id;
+    const authUser = req.authUser;
     try {
       if (!id) {
         return ResponseDtos.createErrorResponse(res, StatusCode.MISSING_PARAM, MessageRes.MISSING_PARAM);
       }
-      const matchup = await Models.Matchup.findOne({ _id: id }).populate('teamCreate').populate({
+      const setTeamAdmin = await MatchupService.getSetTeamAdmin(authUser.id);
+      let matchup = await Models.Matchup.findOne({ _id: id }).populate('teamCreate').populate({
         path: 'attentions',
         model: Models.AttentionMatchup,
-        populate: 'teamCreate'
+        populate: {
+          path: 'teamCreate',
+          model: Models.Team,
+        }
       }).populate({
         path: 'stadium',
         model: Models.Stadium
-      });
+      }).lean();
+      console.log(setTeamAdmin);
+      matchup = setStatusIsMyTeamAdminMatchup(setTeamAdmin, matchup)
+      // matchup.is_my_team_admin_matchup = setTeamAdmin.has(_.get(matchup, 'teamCreate._id').toString())
       if (!matchup) {
         return ResponseDtos.createErrorResponse(res, StatusCode.BAD_REQUEST, 'Matchup not found');
       }
