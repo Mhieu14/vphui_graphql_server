@@ -31,6 +31,7 @@ export default {
   apiGetDetailMatch: async (req, res) => {
     const query = req.query;
     const id = query.match_id;
+    const authUser = req.authUser; 
     try {
       if (!id) {
         return ResponseDtos.createErrorResponse(res, StatusCode.MISSING_PARAM, MessageRes.MISSING_PARAM);
@@ -38,10 +39,21 @@ export default {
       const match = await Models.Match.findOne({ _id: id }).populate('teamA').populate('teamB').populate({
         path: 'stadium',
         model: Models.Stadium
-      });
+      }).lean();
+
       if (!match) {
         return ResponseDtos.createErrorResponse(res, StatusCode.BAD_REQUEST, 'Match not found');
       }
+
+      const idTeamA = _.get(match, 'teamA._id');
+      const idTeamB = _.get(match, 'teamB._id');
+      const listAdmin = await Models.Member.find({
+        team: [idTeamA, idTeamB],
+        role: 'admin',
+        user: authUser.id,
+      }) 
+      match.is_admin = !(listAdmin.length == 0)
+
       return ResponseDtos.createSuccessResponse(res, match);
     } catch (error) {
       console.log(error);
@@ -64,7 +76,10 @@ export default {
       const listMatch = await Models.Match.find().or([
         { teamA : listTeamId },
         { teamB : listTeamId }
-      ])
+      ]).populate('teamA').populate('teamB').populate({
+        path: 'stadium',
+        model: Models.Stadium
+      });
       return ResponseDtos.createSuccessResponse(res, listMatch)
     } catch (error) {
       console.log(error);
