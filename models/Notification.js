@@ -28,6 +28,18 @@ const notificationSchema = Schema(
       type: Schema.Types.ObjectId,
       ref: 'Comment',
     },
+    matchup: {
+      type: Schema.Types.ObjectId,
+      ref: 'Matchup',
+    },
+    match: {
+      type: Schema.Types.ObjectId,
+      ref: 'Match',
+    },
+    member: {
+      type: Schema.Types.ObjectId,
+      ref: 'Member',
+    },
     seen: {
       type: Boolean,
       default: false,

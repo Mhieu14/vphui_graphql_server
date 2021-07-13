@@ -20,6 +20,12 @@ const Query = {
       .populate('follow')
       .populate({ path: 'comment', populate: { path: 'post' } })
       .populate({ path: 'like', populate: { path: 'post' } })
+      .populate({ path: 'member', populate: { path: 'team' } })
+      .populate({ path: 'matchup', populate: { path: 'team' } })
+      .populate({ path: 'match', populate: [
+        { path: 'teamA' },
+        { path: 'teamB' } 
+      ] })
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: 'desc' });
@@ -54,18 +60,19 @@ const Mutation = {
     await User.findOneAndUpdate({ _id: userId }, { $push: { notifications: newNotification.id } });
 
     // Publish notification created event
-    newNotification = await newNotification
-      .populate('author')
-      .populate('follow')
-      .populate({ path: 'comment', populate: { path: 'post' } })
-      .populate({ path: 'like', populate: { path: 'post' } })
-      .execPopulate();
-    pubSub.publish(NOTIFICATION_CREATED_OR_DELETED, {
-      notificationCreatedOrDeleted: {
-        operation: 'CREATE',
-        notification: newNotification,
-      },
-    });
+    // newNotification = await newNotification
+    //   .populate('author')
+    //   .populate('follow')
+    //   .populate({ path: 'comment', populate: { path: 'post' } })
+    //   .populate({ path: 'like', populate: { path: 'post' } })
+    //   .execPopulate();
+
+    // pubSub.publish(NOTIFICATION_CREATED_OR_DELETED, {
+    //   notificationCreatedOrDeleted: {
+    //     operation: 'CREATE',
+    //     notification: newNotification,
+    //   },
+    // });
 
     return newNotification;
   },
@@ -87,12 +94,12 @@ const Mutation = {
       .populate({ path: 'comment', populate: { path: 'post' } })
       .populate({ path: 'like', populate: { path: 'post' } })
       .execPopulate();
-    pubSub.publish(NOTIFICATION_CREATED_OR_DELETED, {
-      notificationCreatedOrDeleted: {
-        operation: 'DELETE',
-        notification,
-      },
-    });
+    // pubSub.publish(NOTIFICATION_CREATED_OR_DELETED, {
+    //   notificationCreatedOrDeleted: {
+    //     operation: 'DELETE',
+    //     notification,
+    //   },
+    // });
 
     return notification;
   },

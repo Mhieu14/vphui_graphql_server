@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import Models from '../../../models/index';
 import MemberRole from '../constants/memberrole.constant';
-
+import NotiService from './notification.service';
 export default {
   addMember: async (teamId, userId) => {
     const session = await mongoose.connection.startSession()
@@ -18,6 +18,7 @@ export default {
   
         await Models.Team.findOneAndUpdate({ _id: teamId }, { $push: { members: newMember.id } });
         await Models.User.findOneAndUpdate({ _id: userId }, { $push: { memberTeams: newMember.id } });
+        await NotiService.createNoti(userId, 'MEMBER', newMember.id);
       });
       session.endSession();
       return newMember;

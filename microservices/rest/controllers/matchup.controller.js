@@ -1,11 +1,12 @@
 import _ from 'lodash';
-import Mongoose from 'mongoose';
+import Mongoose, { Model } from 'mongoose';
 import Schedule from 'node-schedule';
 import Models from '../../../models/index';
 import MessageRes from '../constants/messageres.constant';
 import StatusCode from '../constants/statuscode.constant';
 import ResponseDtos from '../dtos/response.dto';
 import MatchupService from '../services/matchup.service';
+import NotiService from '../services/notification.service';
 
 const setStatusIsMyTeamAdminMatchup = (setTeam, matchup) => {
   matchup.attentions = _.map(matchup.attentions, item => {
@@ -267,6 +268,15 @@ export default {
         matchup: matchupId,
       }
       const newAttention = await MatchupService.createAttention(dataAttentionInsert)
+
+      //send noti
+      const listAdminMatchup = await Models.Member.find({team: matchup.teamCreate, role: 'admin'})
+      const listNotiPromise = []
+      _.forEach(listAdminMatchup, item => {
+        listNotiPromise.push(NotiService.createNoti(_.get(item, 'user'), 'MATCHUP', matchupId))
+      })
+      await Promise.all(listNotiPromise)
+
       return ResponseDtos.createSuccessResponse(res, newAttention);
     } catch (error) {
       console.log(error);
@@ -330,6 +340,13 @@ export default {
       Schedule.scheduleJob(new Date(newMatch.timeStart), function(){
         Models.Match.findOneAndUpdate({ _id: newMatch.id, status: 'active' }, { status: 'happened' });
       });
+      // send noti
+      const listUser = await Models.Member.find().or([{ team: dataMatch.teamAId }, { team: dataMatch.teamBId }])
+      const listNotiPromise = []
+      _.forEach(listUser, item => {
+        listNotiPromise.push(NotiService.createNoti(_.get(item, 'user'), 'MATCH', newMatch.id))
+      })
+      await Promise.all(listNotiPromise)
       return ResponseDtos.createSuccessResponse(res, newMatch);
     } catch (error) {
       console.log(error);

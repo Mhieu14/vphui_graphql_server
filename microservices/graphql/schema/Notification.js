@@ -11,6 +11,9 @@ const NotificationSchema = gql`
     LIKE
     FOLLOW
     COMMENT
+    MEMBER
+    MATCHUP
+    MATCH
   }
 
   type Notification {
@@ -31,7 +34,7 @@ const NotificationSchema = gql`
   # ---------------------------------------------------------
   input CreateNotificationInput {
     userId: ID!
-    authorId: ID!
+    authorId: ID
     postId: ID
     notificationType: NotificationType!
     notificationTypeId: ID
@@ -48,6 +51,28 @@ const NotificationSchema = gql`
   # ---------------------------------------------------------
   # Return Payloads
   # ---------------------------------------------------------
+  type TeamPayload {
+    id: ID
+    teamname: String
+    fullname: String
+  }
+
+  type MemberPayload {
+    id: ID
+    team: TeamPayload
+  }
+
+  type MatchupPayload {
+    id: ID
+    team: TeamPayload
+  }
+
+  type MatchPayload {
+    id: ID
+    teamA: TeamPayload
+    teamB: TeamPayload
+  }
+
   type NotificationPayload {
     id: ID
     user: UserPayload
@@ -55,6 +80,9 @@ const NotificationSchema = gql`
     like: LikePayload
     follow: Follow
     comment: CommentPayload
+    member: MemberPayload
+    matchup: MatchupPayload
+    match: MatchPayload
     createdAt: String
   }
 
