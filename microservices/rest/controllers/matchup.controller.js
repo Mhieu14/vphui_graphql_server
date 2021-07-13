@@ -207,12 +207,11 @@ export default {
         path: 'stadium',
         model: Models.Stadium
       }).lean();
-      console.log(setTeamAdmin);
-      matchup = setStatusIsMyTeamAdminMatchup(setTeamAdmin, matchup)
-      // matchup.is_my_team_admin_matchup = setTeamAdmin.has(_.get(matchup, 'teamCreate._id').toString())
       if (!matchup) {
         return ResponseDtos.createErrorResponse(res, StatusCode.BAD_REQUEST, 'Matchup not found');
       }
+      matchup = setStatusIsMyTeamAdminMatchup(setTeamAdmin, matchup)
+      // matchup.is_my_team_admin_matchup = setTeamAdmin.has(_.get(matchup, 'teamCreate._id').toString())
       return ResponseDtos.createSuccessResponse(res, matchup);
     } catch (error) {
       console.log(error);
