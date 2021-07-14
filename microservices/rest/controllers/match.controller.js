@@ -3,6 +3,7 @@ import Models from '../../../models/index';
 import MessageRes from '../constants/messageres.constant';
 import StatusCode from '../constants/statuscode.constant';
 import ResponseDtos from '../dtos/response.dto';
+import Helper from '../utils/helper';
 
 export default {
   apiGetListMatchTeam: async (req, res) => {
@@ -106,6 +107,7 @@ export default {
       const idTeamB = _.get(match, 'teamB');
       if (isCancel) {
         const teamResult = await Models.Match.findOneAndUpdate({ _id: matchId }, {status: 'cancelled'}, { returnOriginal: false });
+        return ResponseDtos.createSuccessResponse(res, teamResult)
       } else {
         const listAdmin = await Models.Member.find({
           team: [idTeamA, idTeamB],
@@ -143,6 +145,22 @@ export default {
         console.log(updateObject);
         updateObject.status = 'finished'
         const teamResult = await Models.Match.findOneAndUpdate({ _id: matchId }, updateObject, { returnOriginal: false });
+        if (teamResult.teamAGoalUpdateByA == teamResult.teamAGoalUpdateByB && teamResult.teamBGoalUpdateByA == teamResult.teamBGoalUpdateByB) {
+          const [teamA, teamB] = await Promise.all([
+            Models.Team.findOne({_id: idTeamA}),
+            Models.Team.findOne({_id: idTeamB})
+          ])
+          const [teamANewElo, teamBNewElo] = Helper.calculateEloPoint({
+            eloA: teamA.elo,
+            eloB: teamB.elo,
+            goalA: teamResult.teamAGoalUpdateByA,
+            goalB: teamResult.teamBGoalUpdateByA
+          })
+          await Promise.all([
+            Models.Team.findOneAndUpdate({_id: idTeamA}, {elo: teamANewElo}),
+            Models.Team.findOneAndUpdate({_id: idTeamB}, {elo: teamBNewElo})
+          ])
+        }
         return ResponseDtos.createSuccessResponse(res, teamResult)
       }
     } catch(error) {

@@ -6,7 +6,7 @@ const Mutation = {
    * @param {string} postId
    */
   createLike: async (root, { input: { userId, postId } }, { Like, Post, User }) => {
-    const check = Like.find({user: userId, post: postId})
+    const check = await Like.findOne({user: userId, post: postId})
     if (!check) {
       const like = await new Like({ user: userId, post: postId }).save();
 
