@@ -11,7 +11,7 @@ import { createApolloServer } from './utils/apollo-server';
 
 // Connect to database
 connectMongo();
-const isLog = process.env.NODE_ENV !== 'production';
+const isLog = (process.env.NODE_ENV == 'development');
 if (isLog) {
   mongoose.set('debug', true);
 }

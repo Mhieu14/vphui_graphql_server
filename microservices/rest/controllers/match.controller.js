@@ -113,19 +113,19 @@ export default {
           user: authUser.id,
         }) 
         // console.log(listAdmin);
-        let updateObject = null
+        let updateObject = {}
         if ( listAdmin.length == 0 ) {
           return ResponseDtos.createErrorResponse(res, StatusCode.FORBIDDEN, MessageRes.PERMISSIONS_DENIED);
         } 
         else if ( listAdmin.length == 1 ) {
-          idTeamUser = _.get(listAdmin[0], 'team')
-          if ( idTeamA == idTeamUser ) {
+          const idTeamUser = _.get(listAdmin[0], 'team')
+          if ( idTeamA.toString() == idTeamUser.toString() ) {
             updateObject = {
               teamAGoalUpdateByA : totalGoalA,
               teamBGoalUpdateByA : totalGoalB
             }
           };
-          if ( idTeamB == idTeamUser ) {
+          if ( idTeamB.toString() == idTeamUser.toString() ) {
             updateObject = {
               teamAGoalUpdateByB : totalGoalA,
               teamBGoalUpdateByB : totalGoalB
@@ -140,6 +140,7 @@ export default {
             teamBGoalUpdateByB : totalGoalB
           }
         }
+        console.log(updateObject);
         updateObject.status = 'finished'
         const teamResult = await Models.Match.findOneAndUpdate({ _id: matchId }, updateObject, { returnOriginal: false });
         return ResponseDtos.createSuccessResponse(res, teamResult)
