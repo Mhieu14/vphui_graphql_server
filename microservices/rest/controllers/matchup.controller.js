@@ -196,16 +196,22 @@ export default {
         return ResponseDtos.createErrorResponse(res, StatusCode.MISSING_PARAM, MessageRes.MISSING_PARAM);
       }
       const setTeamAdmin = await MatchupService.getSetTeamAdmin(authUser.id);
-      let matchup = await Models.Matchup.findOne({ _id: id }).populate('teamCreate').populate({
-        path: 'attentions',
-        model: Models.AttentionMatchup,
-        populate: {
-          path: 'teamCreate',
-          model: Models.Team,
-        }
-      }).populate({
-        path: 'stadium',
-        model: Models.Stadium
+      let matchup = await Models.Matchup.findOne({ _id: id })
+        .populate('teamCreate')
+        .populate({
+          path: 'userCreate',
+          select: 'fullName username image imagePublicId'
+        })
+        .populate({
+          path: 'attentions',
+          model: Models.AttentionMatchup,
+          populate: {
+            path: 'teamCreate',
+            model: Models.Team,
+          }})
+        .populate({
+          path: 'stadium',
+          model: Models.Stadium
       }).lean();
       if (!matchup) {
         return ResponseDtos.createErrorResponse(res, StatusCode.BAD_REQUEST, 'Matchup not found');
