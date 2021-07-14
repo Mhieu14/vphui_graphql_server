@@ -21,7 +21,7 @@ const Query = {
       .populate({ path: 'comment', populate: { path: 'post' } })
       .populate({ path: 'like', populate: { path: 'post' } })
       .populate({ path: 'member', populate: { path: 'team' } })
-      .populate({ path: 'matchup', populate: { path: 'team' } })
+      .populate({ path: 'matchup', populate: { path: 'teamCreate' } })
       .populate({ path: 'match', populate: [
         { path: 'teamA' },
         { path: 'teamB' } 

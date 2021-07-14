@@ -64,7 +64,7 @@ const NotificationSchema = gql`
 
   type MatchupPayload {
     id: ID
-    team: TeamPayload
+    teamCreate: TeamPayload
   }
 
   type MatchPayload {
